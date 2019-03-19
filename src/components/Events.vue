@@ -1,9 +1,9 @@
 <template>
   <div class="events">
-    <v-layout row wrap>
-      <v-flex v-for="event in events" v-bind:key="event.id" xs12 sm6 md4 lg3>
+    <v-layout row wrap align-center justify-space-around>
+      <span v-for="event in events" v-bind:key="event.id">
         <event-card :event="event"></event-card>
-      </v-flex>
+      </span>
     </v-layout>
   </div>
 </template>

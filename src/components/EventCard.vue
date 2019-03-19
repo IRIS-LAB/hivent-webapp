@@ -1,7 +1,7 @@
 <template>
   <div class="event-card">
     <v-card>
-      <v-img :src="`https://picsum.photos/500/300?image=${event.id + 10}`" contain></v-img>
+      <v-img :src="`https://picsum.photos/500/300?image=${event.id + 10}`" height="180px"></v-img>
       <v-card-title primary-title>
         <div>
           <div class="headline">{{ event.title }}</div>
@@ -34,5 +34,6 @@ export default {
 .event-card {
   margin: 10px;
   background-color: white;
+  width: 300px;
 }
 </style>
