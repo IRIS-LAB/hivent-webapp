@@ -1,13 +1,24 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <v-btn>TEST</v-btn>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view />
+    <nav-bar></nav-bar>
+    <v-content>
+      <div id="nav">
+        <router-link to="/">Home</router-link>|
+        <router-link to="/events">Events</router-link>
+      </div>
+      <router-view/>
+    </v-content>
   </div>
 </template>
+
+<script>
+import NavBar from '@/components/NavBar'
+
+export default {
+  name: 'App',
+  components: { NavBar }
+}
+</script>
 
 <style lang="scss">
 #app {
@@ -16,6 +27,7 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  background-color: #efefef;
 }
 #nav {
   padding: 30px;
