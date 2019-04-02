@@ -10,7 +10,7 @@
 
 <script>
 import EventCard from '@/components/EventCard'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   name: 'events',
@@ -19,6 +19,12 @@ export default {
   },
   computed: {
     ...mapState(['events'])
+  },
+  methods: {
+    ...mapActions(['findEvents'])
+  },
+  mounted() {
+    this.findEvents()
   }
 }
 </script>

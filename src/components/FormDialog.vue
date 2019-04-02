@@ -1,11 +1,9 @@
 <template>
   <div class="form-dialog">
     <v-dialog v-model="displayDialog" max-width="80%">
-      <template v-slot:activator="{ on }">
-        <v-btn fab dark v-on="on" color="indigo">
-          <v-icon dark>add</v-icon>
-        </v-btn>
-      </template>
+      <v-btn fab dark color="indigo" slot="activator">
+        <v-icon dark>add</v-icon>
+      </v-btn>
       <v-card>
         <v-card-title>
           <span class="headline">Créer un évènement</span>
