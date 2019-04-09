@@ -17,6 +17,10 @@ export default new Vuex.Store({
       let data = await fetch(process.env.VUE_APP_EVENTS_API_URI + '/events', { method: 'GET', mode: 'cors' })
       let events = await data.json()
       console.log(events)
+      events.forEach(event => {
+        event.startDate = new Date(event.startDate)
+        event.endDate = new Date(event.endDate)
+      })
       commit('setEvents', events)
     }
   }
