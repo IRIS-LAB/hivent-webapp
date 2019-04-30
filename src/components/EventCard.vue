@@ -33,7 +33,7 @@ export default {
       console.log('startDAte :: ', typeof this.event.startDate)
       const lblDate =
         'Le ' +
-        moment(this.event.startDate).format('DD MM YYYY') +
+        moment(this.event.startDate).format('DD/MM/YYYY') +
         ' de ' +
         moment(this.event.startDate).format('HH:mm') +
         ' à ' +
