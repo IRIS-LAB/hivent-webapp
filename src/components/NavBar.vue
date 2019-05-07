@@ -4,17 +4,17 @@
       <v-toolbar-title class="white--text">Hivent</v-toolbar-title>
       <v-spacer></v-spacer>
 
-      <form-dialog></form-dialog>
+      <event-dialog></event-dialog>
     </v-toolbar>
   </div>
 </template>
 
 <script>
-import FormDialog from '@/components/FormDialog'
+import EventDialog from '@/views/EventDialog'
 
 export default {
   components: {
-    FormDialog
+    EventDialog
   },
   data() {
     return {}

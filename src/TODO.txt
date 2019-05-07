@@ -1,0 +1,8 @@
+Event creation 
+---------------
+Fix date format when sending to api (add event)
+speakerId to add
+Window doesn't close on Validate
+Events list not refresh
+Errors from API
+Think of mobile design

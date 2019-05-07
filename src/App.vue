@@ -3,8 +3,7 @@
     <nav-bar></nav-bar>
     <v-content>
       <div id="nav">
-        <router-link to="/">Home</router-link>|
-        <router-link to="/events">Events</router-link>
+      
       </div>
       <router-view/>
     </v-content>
