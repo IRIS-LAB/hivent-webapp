@@ -3,23 +3,25 @@
     <v-toolbar dark app>
       <v-toolbar-title class="white--text">Hivent</v-toolbar-title>
       <v-spacer></v-spacer>
+      <v-btn fab dark color="indigo" @click="setShowEventDialog(true)">
+        <v-icon dark>add</v-icon>
+      </v-btn>
 
-      <form-dialog></form-dialog>
     </v-toolbar>
   </div>
 </template>
 
 <script>
-import FormDialog from '@/components/FormDialog'
+
+import {mapActions} from 'vuex'
 
 export default {
-  components: {
-    FormDialog
-  },
   data() {
     return {}
   },
-  methods: {}
+  methods: {
+    ...mapActions(['setShowEventDialog'])
+  }
 }
 </script>
 
