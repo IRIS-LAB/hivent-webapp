@@ -2,9 +2,7 @@
   <v-app id="app">
     <nav-bar></nav-bar>
     <v-content>
-      <div id="nav">
-      
-      </div>
+      <event-dialog v-if='showEventDialog'></event-dialog>
       <router-view/>
     </v-content>
   </v-app>
@@ -12,10 +10,16 @@
 
 <script>
 import NavBar from '@/components/NavBar'
+import EventDialog from '@/views/EventDialog'
+import {mapState} from 'vuex'
+
 
 export default {
   name: 'App',
-  components: { NavBar }
+  components: { NavBar, EventDialog },
+  computed:{
+    ...mapState(['showEventDialog'])
+  }
 }
 </script>
 

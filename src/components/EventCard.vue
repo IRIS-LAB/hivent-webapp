@@ -6,7 +6,7 @@
       <v-card-title primary-title>
         <div>
           <h3 class="headline mb-0">{{ event.title }}</h3>
-          <div>{{eventDateLabel}}</div>
+          <div>{{ eventDateLabel }}</div>
         </div>
       </v-card-title>
       <v-card-actions>
@@ -30,7 +30,6 @@ export default {
   }),
   computed: {
     eventDateLabel() {
-      console.log('startDAte :: ', typeof this.event.startDate)
       const lblDate =
         'Le ' +
         moment(this.event.startDate).format('DD/MM/YYYY') +

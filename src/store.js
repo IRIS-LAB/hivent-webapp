@@ -4,19 +4,23 @@ import { BusinessException, TechnicalException } from '@u-iris/iris-common'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
+  strict: true,
   state: {
-    events: []
+    events: [],
+    showEventDialog: false
   },
   mutations: {
     setEvents(state, events) {
       state.events = events
+    },
+    setShowEventDialog(state, showEventDialog) {
+      state.showEventDialog = showEventDialog
     }
   },
   actions: {
     async findEvents({ commit }) {
-      let data = await fetch(process.env.VUE_APP_EVENTS_API_URI + '/events', { method: 'GET', mode: 'cors' })
-      let events = await data.json()
-      console.log(events)
+      const data = await fetch(process.env.VUE_APP_EVENTS_API_URI + '/events', { method: 'GET', mode: 'cors' })
+      const events = await data.json()
       events.forEach(event => {
         event.startDate = new Date(event.startDate)
         event.endDate = new Date(event.endDate)
@@ -24,23 +28,25 @@ export default new Vuex.Store({
       commit('setEvents', events)
     },
     async createEvent({ dispatch }, event) {
-      let data = await fetch(process.env.VUE_APP_EVENTS_API_URI + '/events', {
+      const data = await fetch(process.env.VUE_APP_EVENTS_API_URI + '/events', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         mode: 'cors',
         body: JSON.stringify(event)
       })
-      console.log('data', data)
       const json = await data.json()
       switch (data.status) {
-        case '400':
+        case 400:
           throw new BusinessException(json.erreurs)
-        case '201':
+        case 201:
           dispatch('findEvents')
           break
         default:
           throw new TechnicalException(json.erreurs)
       }
+    },
+    setShowEventDialog({ commit }, showEventDialog) {
+      commit('setShowEventDialog', showEventDialog)
     }
   }
 })

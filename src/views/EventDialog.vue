@@ -1,10 +1,7 @@
 <template>
   <div class="event-dialog">
-    <v-dialog v-model="displayDialog" min-width="50%" max-width="70%">
-      <v-btn fab dark color="indigo" slot="activator">
-        <v-icon dark>add</v-icon>
-      </v-btn>
-      <v-card>
+    <v-dialog :value='true' min-width="50%" max-width="70%" persistent>
+        <v-card>
         <v-card-title class="title-bar">
           <span class="headline">Créer un évènement</span>
         </v-card-title>
@@ -27,8 +24,7 @@
                 full-width
                 min-width="290px"
               >
-                <v-text-field
-                  style="margin:5px"
+                <v-text-field style="margin:5px"
                   :value="dateAsTextFieldFormat"
                   @blur="setDateFromTextFieldFormat"
                   slot="activator"
@@ -37,39 +33,26 @@
                   hint="DD/MM/YYYY"
                   persistent-hint
                 ></v-text-field>
-                <v-date-picker
-                  @input="setDateFromDatePicker"
-                  :value="dateAsPickerDateFormat"
-                  locale="fr"
-                  no-title
-                ></v-date-picker>
+                <v-date-picker @input="setDateFromDatePicker" :value="dateAsPickerDateFormat" locale="fr" no-title></v-date-picker>
               </v-menu>
             </v-flex>
             <v-flex xs12 sm4>
-              <v-text-field
-                style="margin:5px"
-                type="time"
-                label="Heure début"
-                v-model="date.startHour"
-              ></v-text-field>
+              <v-text-field style="margin:5px" type="time" label="Heure début" v-model="date.startHour"></v-text-field>
             </v-flex>
             <v-flex xs12 sm4>
               <v-text-field style="margin:5px" type="time" label="Heure fin" v-model="date.endHour"></v-text-field>
             </v-flex>
             <v-flex xs12 sm2>
-              <v-text-field
-                style="margin:5px"
-                type="number"
-                label="Nombre de places"
-                min="1"
-                v-model="event.maxSeatsNb"
-              ></v-text-field>
+              <v-text-field style="margin:5px" type="number" label="Nombre de places" min="1" v-model="event.maxSeatsNb"></v-text-field>
+            </v-flex>
+                        <v-flex xs12 sm10>
+              <v-text-field style="margin:5px" type="string" label="Animateurs" v-model="speakerIds"></v-text-field>
             </v-flex>
           </v-layout>
         </v-card-text>
         <v-layout row justify-end>
           <v-card-actions>
-            <v-btn dark color="indigo" @click="displayDialog = false">Fermer</v-btn>
+            <v-btn dark color="indigo" @click="setShowEventDialog(false)">Fermer</v-btn>
             <v-btn dark color="indigo" @click="addEvent">Valider</v-btn>
           </v-card-actions>
         </v-layout>
@@ -79,21 +62,23 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import moment from 'moment'
 
 export default {
+  name: 'EventDialog',
   data() {
     return {
-      displayDialog: false,
       displayDatePicker: false,
       administratorId: '',
+      speakerIds: [],
       // TODO: Set administrator id with connected user mail
       event: { title: '', description: '', startDate: '', endDate: '', administratorIds: ['admin@systeme-u.fr'], speakerIds: [], maxSeatsNb: 1 },
       date: { day: undefined, startHour: '', endHour: '' }
     }
   },
   computed: {
+    ...mapState(['showEventDialog']),
     dateAsPickerDateFormat() {
       return this.date.day ? this.date.day.format('YYYY-MM-DD') : null
     },
@@ -102,8 +87,12 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['createEvent']),
+    ...mapActions(['createEvent', 'setShowEventDialog']),
 
+    /**
+     * Add event
+     * Call the API to save the event
+     */
     addEvent: async function() {
       let eventDate = new Date(moment(this.date.day).toDate())
       const splittedStartHour = this.date.startHour.split(':')
@@ -116,15 +105,16 @@ export default {
       eventDate.setMinutes(splittedEndHour[1])
       this.event.endDate = eventDate.toISOString()
 
-      this.event.administratorIds.push(this.administratorId)
+      this.event.speakerIds = this.speakerIds.split(',')
+
+      // this.event.administratorIds.push(this.administratorId)
       try {
         await this.createEvent(this.event)
-        this.displayDialog = false
+        this.setShowEventDialog(false)
       } catch (error) {
         console.log(error.errors)
       }
     },
-
     setDateFromDatePicker(val) {
       this.displayDatePicker = false
       if (!val) return
@@ -144,7 +134,6 @@ export default {
 <style scoped lang="scss">
 .title-bar {
   background-color: #3f51b5;
-  color: white
-
-  }
+  color: white;
+}
 </style>

@@ -3,23 +3,25 @@
     <v-toolbar dark app>
       <v-toolbar-title class="white--text">Hivent</v-toolbar-title>
       <v-spacer></v-spacer>
+      <v-btn fab dark color="indigo" @click="setShowEventDialog(true)">
+        <v-icon dark>add</v-icon>
+      </v-btn>
 
-      <event-dialog></event-dialog>
     </v-toolbar>
   </div>
 </template>
 
 <script>
-import EventDialog from '@/views/EventDialog'
+
+import {mapActions} from 'vuex'
 
 export default {
-  components: {
-    EventDialog
-  },
   data() {
     return {}
   },
-  methods: {}
+  methods: {
+    ...mapActions(['setShowEventDialog'])
+  }
 }
 </script>
 
