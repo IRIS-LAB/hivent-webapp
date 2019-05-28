@@ -1,62 +1,105 @@
 <template>
   <div class="event-dialog">
-    <v-dialog :value='true' min-width="50%" max-width="70%" persistent>
+    <v-dialog :value="true" min-width="50%" max-width="70%" persistent id="eventDialog">
+      <v-form ref="form" v-model="valid">
         <v-card>
-        <v-card-title class="title-bar">
-          <span class="headline">Créer un évènement</span>
-        </v-card-title>
-        <v-card-text>
-          <v-layout wrap>
-            <v-flex xs12 sm6>
-              <v-text-field style="margin:5px" label="Titre" v-model="event.title"></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm12>
-              <v-textarea rows="4" label="Description" v-model="event.description"/>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <v-menu
-                v-model="displayDatePicker"
-                :close-on-content-click="false"
-                :nudge-right="40"
-                lazy
-                transition="scale-transition"
-                offset-y
-                full-width
-                min-width="290px"
-              >
-                <v-text-field style="margin:5px"
-                  :value="dateAsTextFieldFormat"
-                  @blur="setDateFromTextFieldFormat"
-                  slot="activator"
-                  label="Date"
-                  prepend-icon="event"
-                  hint="DD/MM/YYYY"
-                  persistent-hint
+          <v-card-title class="title-bar">
+            <span class="headline">Créer un évènement</span>
+          </v-card-title>
+          <v-card-text>
+            <v-layout wrap>
+              <v-flex xs12 sm6>
+                <v-text-field
+                  style="margin:5px"
+                  label="Titre"
+                  v-model="event.title"
+                  :rules="titleRules"
                 ></v-text-field>
-                <v-date-picker @input="setDateFromDatePicker" :value="dateAsPickerDateFormat" locale="fr" no-title></v-date-picker>
-              </v-menu>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <v-text-field style="margin:5px" type="time" label="Heure début" v-model="date.startHour"></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm4>
-              <v-text-field style="margin:5px" type="time" label="Heure fin" v-model="date.endHour"></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm2>
-              <v-text-field style="margin:5px" type="number" label="Nombre de places" min="1" v-model="event.maxSeatsNb"></v-text-field>
-            </v-flex>
-                        <v-flex xs12 sm10>
-              <v-text-field style="margin:5px" type="string" label="Animateurs" v-model="speakerIds"></v-text-field>
-            </v-flex>
+              </v-flex>
+              <v-flex xs12 sm12>
+                <v-textarea rows="4" label="Description" v-model="event.description"/>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <v-menu
+                  v-model="displayDatePicker"
+                  :close-on-content-click="false"
+                  :nudge-right="40"
+                  lazy
+                  transition="scale-transition"
+                  offset-y
+                  full-width
+                  min-width="290px"
+                >
+                  <v-text-field
+                    style="margin:5px"
+                    :value="dateAsTextFieldFormat"
+                    @blur="setDateFromTextFieldFormat"
+                    slot="activator"
+                    label="Date"
+                    prepend-icon="event"
+                    hint="DD/MM/YYYY"
+                    persistent-hint
+                    :rules="dayRules"
+                  ></v-text-field>
+                  <v-date-picker
+                    @input="setDateFromDatePicker"
+                    :value="dateAsPickerDateFormat"
+                    locale="fr"
+                    no-title
+                  ></v-date-picker>
+                </v-menu>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <v-text-field
+                  style="margin:5px"
+                  type="time"
+                  label="Heure début"
+                  v-model="date.startHour"
+                  :rules="startHourRules"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm4>
+                <v-text-field
+                  style="margin:5px"
+                  type="time"
+                  label="Heure fin"
+                  v-model="date.endHour"
+                  :rules="endHourRules"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm2>
+                <v-text-field
+                  style="margin:5px"
+                  type="number"
+                  label="Nombre de places"
+                  min="1"
+                  v-model="event.maxSeatsNb"
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm10>
+                <v-text-field
+                  style="margin:5px"
+                  type="string"
+                  label="Animateurs"
+                  v-model="speakerIds"
+                  :rules="speakerIdsRules"
+                ></v-text-field>
+              </v-flex>
+            </v-layout>
+          </v-card-text>
+          <v-layout row justify-end>
+            <v-card-actions>
+              <v-btn style="color: white" color="indigo" @click="setShowEventDialog(false)">Fermer</v-btn>
+              <v-btn
+                style="color: white"
+                color="indigo"
+                @click="addEvent"
+                :disabled="!valid"
+              >Valider</v-btn>
+            </v-card-actions>
           </v-layout>
-        </v-card-text>
-        <v-layout row justify-end>
-          <v-card-actions>
-            <v-btn dark color="indigo" @click="setShowEventDialog(false)">Fermer</v-btn>
-            <v-btn dark color="indigo" @click="addEvent">Valider</v-btn>
-          </v-card-actions>
-        </v-layout>
-      </v-card>
+        </v-card>
+      </v-form>
     </v-dialog>
   </div>
 </template>
@@ -64,6 +107,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import moment from 'moment'
+import { required, notEmpty } from '../utils/RulesUtils'
 
 export default {
   name: 'EventDialog',
@@ -74,7 +118,15 @@ export default {
       speakerIds: [],
       // TODO: Set administrator id with connected user mail
       event: { title: '', description: '', startDate: '', endDate: '', administratorIds: ['admin@systeme-u.fr'], speakerIds: [], maxSeatsNb: 1 },
-      date: { day: undefined, startHour: '', endHour: '' }
+      date: { day: undefined, startHour: '', endHour: '' },
+      valid: false,
+
+      // rules
+      titleRules: [required()],
+      dayRules: [required()],
+      startHourRules: [required()],
+      endHourRules: [required()],
+      speakerIdsRules: [required(), notEmpty()]
     }
   },
   computed: {
@@ -87,14 +139,14 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['createEvent', 'setShowEventDialog']),
+    ...mapActions(['createEvent', 'setShowEventDialog', 'setErrors']),
 
     /**
      * Add event
      * Call the API to save the event
      */
     addEvent: async function() {
-      let eventDate = new Date(moment(this.date.day).toDate())
+      const eventDate = new Date(moment(this.date.day).toDate())
       const splittedStartHour = this.date.startHour.split(':')
       eventDate.setHours(splittedStartHour[0])
       eventDate.setMinutes(splittedStartHour[1])
@@ -112,7 +164,7 @@ export default {
         await this.createEvent(this.event)
         this.setShowEventDialog(false)
       } catch (error) {
-        console.log(error.errors)
+        this.setErrors(error.errors)
       }
     },
     setDateFromDatePicker(val) {
