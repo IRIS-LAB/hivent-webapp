@@ -1,0 +1,6 @@
+{
+  "string.min": "La longueur du champ {0} doit être supérieure ou égale à {1} caractères.",
+  "string.max": "La longueur du champ {0} doit être inférieure ou égale à {1} caractères.",
+  "string.email": "Le champ {0} doit être un email valide.",
+  "any.empty": "Le champ {0} doit être renseigné."
+}

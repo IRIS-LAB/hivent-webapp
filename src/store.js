@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { transformErrorToException } from './utils/ExceptionUtils'
+import { getTranslatedMessage } from './utils/TranslationsUtils'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -9,6 +10,13 @@ export default new Vuex.Store({
     events: [],
     showEventDialog: false,
     errors: []
+  },
+  getters: {
+    getErrors: state => field =>
+      state.errors
+        .filter(error => error.champErreur.startsWith(field))
+        .map(error => getTranslatedMessage(error))
+        .join('<br>')
   },
   mutations: {
     setEvents(state, events) {
@@ -47,6 +55,14 @@ export default new Vuex.Store({
     },
     setErrors({ commit }, errors) {
       commit('setErrors', errors)
+    },
+    clearErrors({ commit, state }, field) {
+      commit(
+        'setErrors',
+        state.errors.filter(error => {
+          return !error.champErreur.startsWith(field)
+        })
+      )
     }
   }
 })

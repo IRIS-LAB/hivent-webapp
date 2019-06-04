@@ -14,10 +14,18 @@
                   label="Titre"
                   v-model="event.title"
                   :rules="titleRules"
+                  :error-messages="getErrors('title')"
+                  @input="clearErrors('title')"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 sm12>
-                <v-textarea rows="4" label="Description" v-model="event.description"/>
+                <v-textarea
+                  rows="4"
+                  label="Description"
+                  v-model="event.description"
+                  :error-messages="getErrors('description')"
+                  @input="clearErrors('description')"
+                />
               </v-flex>
               <v-flex xs12 sm4>
                 <v-menu
@@ -65,6 +73,8 @@
                   label="Heure fin"
                   v-model="date.endHour"
                   :rules="endHourRules"
+                  :error-messages="getErrors('endDate')"
+                  @input="clearErrors('endDate')"
                 ></v-text-field>
               </v-flex>
               <v-flex xs12 sm2>
@@ -83,6 +93,8 @@
                   label="Animateurs"
                   v-model="speakerIds"
                   :rules="speakerIdsRules"
+                  :error-messages="getErrors('speakerIds')"
+                  @input="clearErrors('speakerIds')"
                 ></v-text-field>
               </v-flex>
             </v-layout>
@@ -105,9 +117,9 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapGetters, mapActions, mapState } from 'vuex'
 import moment from 'moment'
-import { required, notEmpty } from '../utils/RulesUtils'
+import { required } from '../utils/RulesUtils'
 
 export default {
   name: 'EventDialog',
@@ -115,7 +127,7 @@ export default {
     return {
       displayDatePicker: false,
       administratorId: '',
-      speakerIds: [],
+      speakerIds: '',
       // TODO: Set administrator id with connected user mail
       event: { title: '', description: '', startDate: '', endDate: '', administratorIds: ['admin@systeme-u.fr'], speakerIds: [], maxSeatsNb: 1 },
       date: { day: undefined, startHour: '', endHour: '' },
@@ -126,11 +138,11 @@ export default {
       dayRules: [required()],
       startHourRules: [required()],
       endHourRules: [required()],
-      speakerIdsRules: [required(), notEmpty()]
+      speakerIdsRules: [required()]
     }
   },
   computed: {
-    ...mapState(['showEventDialog']),
+    ...mapGetters(['getErrors']),
     dateAsPickerDateFormat() {
       return this.date.day ? this.date.day.format('YYYY-MM-DD') : null
     },
@@ -139,8 +151,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['createEvent', 'setShowEventDialog', 'setErrors']),
-
+    ...mapActions(['createEvent', 'setShowEventDialog', 'setErrors', 'clearErrors']),
     /**
      * Add event
      * Call the API to save the event
@@ -157,7 +168,7 @@ export default {
       eventDate.setMinutes(splittedEndHour[1])
       this.event.endDate = eventDate.toISOString()
 
-      this.event.speakerIds = this.speakerIds.split(',')
+      this.event.speakerIds = this.speakerIds ? this.speakerIds.split(',') : []
 
       // this.event.administratorIds.push(this.administratorId)
       try {
