@@ -1,0 +1,9 @@
+28/05/2019
+-----------
+Add mandatory controls on event creation dialog (validate button grayed if form not valid)
+
+
+TODO
+-----
+Delete mandatory description in API
+Add utils to manage api's errors

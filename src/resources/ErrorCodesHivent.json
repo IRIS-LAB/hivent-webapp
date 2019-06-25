@@ -1,0 +1,4 @@
+{
+  "endDate.date.greater": "La date de fin doît être supérieure à la date de début.",
+  "speakerIds.string.email": "La liste des animateurs doit être constituée d'emails valides."
+}

@@ -1,13 +1,22 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { BusinessException, TechnicalException } from '@u-iris/iris-common'
+import { transformErrorToException } from './utils/ExceptionUtils'
+import { getTranslatedMessage } from './utils/TranslationsUtils'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   strict: true,
   state: {
     events: [],
-    showEventDialog: false
+    showEventDialog: false,
+    errors: []
+  },
+  getters: {
+    getErrors: state => field =>
+      state.errors
+        .filter(error => error.champErreur.startsWith(field))
+        .map(error => getTranslatedMessage(error))
+        .join('<br>')
   },
   mutations: {
     setEvents(state, events) {
@@ -15,6 +24,9 @@ export default new Vuex.Store({
     },
     setShowEventDialog(state, showEventDialog) {
       state.showEventDialog = showEventDialog
+    },
+    setErrors(state, errors) {
+      state.errors = errors
     }
   },
   actions: {
@@ -34,19 +46,23 @@ export default new Vuex.Store({
         mode: 'cors',
         body: JSON.stringify(event)
       })
-      const json = await data.json()
-      switch (data.status) {
-        case 400:
-          throw new BusinessException(json.erreurs)
-        case 201:
-          dispatch('findEvents')
-          break
-        default:
-          throw new TechnicalException(json.erreurs)
-      }
+
+      if (data.status == 201) dispatch('findEvents')
+      else await transformErrorToException(data)
     },
     setShowEventDialog({ commit }, showEventDialog) {
       commit('setShowEventDialog', showEventDialog)
+    },
+    setErrors({ commit }, errors) {
+      commit('setErrors', errors)
+    },
+    clearErrors({ commit, state }, field) {
+      commit(
+        'setErrors',
+        state.errors.filter(error => {
+          return !error.champErreur.startsWith(field)
+        })
+      )
     }
   }
 })
