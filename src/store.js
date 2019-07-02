@@ -12,11 +12,14 @@ export default new Vuex.Store({
     errors: []
   },
   getters: {
-    getErrors: state => field =>
-      state.errors
-        .filter(error => error.champErreur.startsWith(field))
-        .map(error => getTranslatedMessage(error))
-        .join('<br>')
+    getErrors: state => field => {
+      if (state.errors) {
+        return state.errors
+          .filter(error => error.champErreur.startsWith(field))
+          .map(error => getTranslatedMessage(error))
+          .join('<br>')
+      }
+    }
   },
   mutations: {
     setEvents(state, events) {
@@ -31,7 +34,10 @@ export default new Vuex.Store({
   },
   actions: {
     async findEvents({ commit }) {
-      const data = await fetch(process.env.VUE_APP_EVENTS_API_URI + '/events', { method: 'GET', mode: 'cors' })
+      const data = await fetch(process.env.VUE_APP_EVENTS_API_URI + '/events', {
+        method: 'GET',
+        mode: 'cors'
+      })
       const events = await data.json()
       events.forEach(event => {
         event.startDate = new Date(event.startDate)
@@ -49,7 +55,9 @@ export default new Vuex.Store({
 
       if (data.status == 201) dispatch('findEvents')
       else {
-        commit('setErrors', (await data.json()).erreurs)
+        const errors = await data.json().erreurs
+        commit('setErrors', errors)
+        console.log(errors)
         await transformErrorToException(data)
       }
     },

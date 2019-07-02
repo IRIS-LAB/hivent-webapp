@@ -5,5 +5,5 @@ Add mandatory controls on event creation dialog (validate button grayed if form 
 
 TODO
 -----
-Delete mandatory description in API
-Add utils to manage api's errors
+In EventDialog add a global field for errors with empty fild (champ) in API errors
+Image event in Google Bucket

@@ -8,7 +8,7 @@
           </v-card-title>
           <v-card-text>
             <v-layout wrap>
-              <v-flex xs12 sm6>
+              <v-flex xs12 sm12>
                 <v-text-field
                   style="margin:5px"
                   label="Titre"
@@ -18,6 +18,25 @@
                   @input="clearErrors('title')"
                 ></v-text-field>
               </v-flex>
+              <v-flex xs12 sm6>
+                <v-text-field
+                  label="Image"
+                  v-model="imageFile"
+                  @click="pickImageFile"
+                  prepend-icon="attach_file"
+                ></v-text-field>
+                <input
+                  type="file"
+                  style="display: none"
+                  ref="image"
+                  accept="image/*"
+                  @change="imageFilePicked"
+                />
+              </v-flex>
+              <v-spacer></v-spacer>
+              <img :src="imageUrl" height="150" v-if="imageUrl" />
+
+              <!--input id="image" type="file" name="files[]"-->
               <v-flex xs12 sm12>
                 <v-textarea
                   rows="4"
@@ -120,6 +139,7 @@
 import { mapGetters, mapActions, mapState } from 'vuex'
 import moment from 'moment'
 import { required } from '../utils/RulesUtils'
+// import { uploadImage } from '../utils/BucketUtils'
 
 export default {
   name: 'EventDialog',
@@ -129,8 +149,18 @@ export default {
       administratorId: '',
       speakerIds: '',
       // TODO: Set administrator id with connected user mail
-      event: { title: '', description: '', startDate: '', endDate: '', administratorIds: ['admin@systeme-u.fr'], speakerIds: [], maxSeatsNb: 1 },
+      event: {
+        title: '',
+        description: '',
+        startDate: '',
+        endDate: '',
+        administratorIds: ['admin@systeme-u.fr'],
+        speakerIds: [],
+        maxSeatsNb: 1
+      },
       date: { day: undefined, startHour: '', endHour: '' },
+      imageFile: '',
+      imageUrl: undefined,
       valid: false,
 
       // rules
@@ -151,12 +181,18 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['createEvent', 'setShowEventDialog', 'setErrors', 'clearErrors']),
+    ...mapActions([
+      'createEvent',
+      'setShowEventDialog',
+      'setErrors',
+      'clearErrors'
+    ]),
     /**
      * Add event
      * Call the API to save the event
      */
     addEvent: async function() {
+      // date and hours
       const eventDate = new Date(moment(this.date.day).toDate())
       const splittedStartHour = this.date.startHour.split(':')
       eventDate.setHours(splittedStartHour[0])
@@ -170,12 +206,17 @@ export default {
 
       this.event.speakerIds = this.speakerIds ? this.speakerIds.split(',') : []
 
+      // image
+      // console.log('imageFile : ', this.imageFile)
+
+      // upload image
+      // const imageURL = await uploadImage()
       // this.event.administratorIds.push(this.administratorId)
       try {
-        await this.createEvent(this.event)
+        const newEvent = await this.createEvent(this.event)
         this.setShowEventDialog(false)
       } catch (error) {
-        // NOP
+        // TODO : if the API not reached ?
       }
     },
     setDateFromDatePicker(val) {
@@ -189,6 +230,20 @@ export default {
       if (!val) return
       this.date.day = moment(val, 'DD/MM/YYYY')
       //this.$emit('input', this.date.day.format('YYYY-MM-DD'))
+    },
+    pickImageFile() {
+      this.$refs.image.click()
+    },
+    imageFilePicked(e) {
+      const files = e.target.files
+      if (files[0] !== undefined) {
+        this.imageFile = files[0].name
+        const fr = new FileReader()
+        fr.readAsDataURL(files[0])
+        fr.addEventListener('load', () => {
+          this.imageUrl = fr.result
+        })
+      }
     }
   }
 }
