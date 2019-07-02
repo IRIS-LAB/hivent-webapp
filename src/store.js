@@ -39,7 +39,7 @@ export default new Vuex.Store({
       })
       commit('setEvents', events)
     },
-    async createEvent({ dispatch }, event) {
+    async createEvent({ dispatch, commit }, event) {
       const data = await fetch(process.env.VUE_APP_EVENTS_API_URI + '/events', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -48,7 +48,10 @@ export default new Vuex.Store({
       })
 
       if (data.status == 201) dispatch('findEvents')
-      else await transformErrorToException(data)
+      else {
+        commit('setErrors', (await data.json()).erreurs)
+        await transformErrorToException(data)
+      }
     },
     setShowEventDialog({ commit }, showEventDialog) {
       commit('setShowEventDialog', showEventDialog)

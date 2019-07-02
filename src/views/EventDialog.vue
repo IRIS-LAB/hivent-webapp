@@ -175,7 +175,7 @@ export default {
         await this.createEvent(this.event)
         this.setShowEventDialog(false)
       } catch (error) {
-        this.setErrors(error.errors)
+        // NOP
       }
     },
     setDateFromDatePicker(val) {
