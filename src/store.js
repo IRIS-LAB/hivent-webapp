@@ -9,7 +9,13 @@ export default new Vuex.Store({
   state: {
     events: [],
     showEventDialog: false,
-    errors: []
+    errors: [],
+    isLoading: false,
+    confirm: {
+      display: false,
+      title: undefined,
+      message: undefined
+    }
   },
   getters: {
     getErrors: state => field => {
@@ -30,9 +36,21 @@ export default new Vuex.Store({
     },
     setErrors(state, errors) {
       state.errors = errors
+    },
+    setIsLoading(state, isLoading) {
+      state.isLoading = isLoading
+    },
+    setConfirm(state, confirm) {
+      state.confirm = confirm
     }
   },
   actions: {
+    setIsLoading({ commit }, isLoading) {
+      commit('setIsLoading', isLoading)
+    },
+    setConfirm({ commit }, confirm) {
+      commit('setConfirm', confirm)
+    },
     async findEvents({ commit }) {
       const data = await fetch(process.env.VUE_APP_EVENTS_API_URI + '/events', {
         method: 'GET',
@@ -45,7 +63,7 @@ export default new Vuex.Store({
       })
       commit('setEvents', events)
     },
-    async createEvent({ dispatch, commit }, event) {
+    async createEvent({ dispatch, commit }, { event, image }) {
       const data = await fetch(process.env.VUE_APP_EVENTS_API_URI + '/events', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -53,11 +71,36 @@ export default new Vuex.Store({
         body: JSON.stringify(event)
       })
 
-      if (data.status == 201) dispatch('findEvents')
-      else {
+      if (data.status == 201) {
+        await dispatch('uploadImage', {
+          image: image,
+          eventId: (await data.json()).id
+        })
+        await dispatch('findEvents')
+      } else {
         const errors = await data.json().erreurs
         commit('setErrors', errors)
-        console.log(errors)
+        await transformErrorToException(data)
+      }
+    },
+    async uploadImage({ commit }, { image, eventId }) {
+      const newImage = {
+        image: image.split(',')[1],
+        format: image.split('image/')[1].split(';')[0]
+      }
+      const data = await fetch(
+        process.env.VUE_APP_EVENTS_API_URI + `/events/${eventId}/image`,
+        {
+          method: 'PUT',
+          headers: { 'content-type': 'application/json' },
+          mode: 'cors',
+          body: JSON.stringify(newImage)
+        }
+      )
+
+      if (data.status != 200) {
+        const errors = await data.json().erreurs
+        commit('setErrors', errors)
         await transformErrorToException(data)
       }
     },

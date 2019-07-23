@@ -34,7 +34,7 @@
                 />
               </v-flex>
               <v-spacer></v-spacer>
-              <img :src="imageUrl" height="150" v-if="imageUrl" />
+              <img :src="image" height="150" v-if="image" />
 
               <!--input id="image" type="file" name="files[]"-->
               <v-flex xs12 sm12>
@@ -160,7 +160,7 @@ export default {
       },
       date: { day: undefined, startHour: '', endHour: '' },
       imageFile: '',
-      imageUrl: undefined,
+      image: undefined,
       valid: false,
 
       // rules
@@ -185,13 +185,15 @@ export default {
       'createEvent',
       'setShowEventDialog',
       'setErrors',
-      'clearErrors'
+      'clearErrors',
+      'setIsLoading'
     ]),
     /**
      * Add event
      * Call the API to save the event
      */
     addEvent: async function() {
+      this.setIsLoading(true)
       // date and hours
       const eventDate = new Date(moment(this.date.day).toDate())
       const splittedStartHour = this.date.startHour.split(':')
@@ -213,10 +215,16 @@ export default {
       // const imageURL = await uploadImage()
       // this.event.administratorIds.push(this.administratorId)
       try {
-        const newEvent = await this.createEvent(this.event)
+        const newEvent = await this.createEvent({
+          event: this.event,
+          image: this.image
+        })
+
         this.setShowEventDialog(false)
       } catch (error) {
         // TODO : if the API not reached ?
+      } finally {
+        this.setIsLoading(false)
       }
     },
     setDateFromDatePicker(val) {
@@ -241,7 +249,7 @@ export default {
         const fr = new FileReader()
         fr.readAsDataURL(files[0])
         fr.addEventListener('load', () => {
-          this.imageUrl = fr.result
+          this.image = fr.result
         })
       }
     }
