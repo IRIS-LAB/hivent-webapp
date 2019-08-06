@@ -13,8 +13,10 @@ export default new Vuex.Store({
     isLoading: false,
     confirm: {
       display: false,
-      title: undefined,
-      message: undefined
+      title: null,
+      message: null,
+      callbackConfirmed: null,
+      callbackCanceled: null
     }
   },
   getters: {
@@ -48,8 +50,11 @@ export default new Vuex.Store({
     setIsLoading({ commit }, isLoading) {
       commit('setIsLoading', isLoading)
     },
-    setConfirm({ commit }, confirm) {
+    showConfirm({ commit }, confirm) {
       commit('setConfirm', confirm)
+    },
+    closeConfirm({ commit }) {
+      commit('setConfirm', { display: false })
     },
     async findEvents({ commit }) {
       const data = await fetch(process.env.VUE_APP_EVENTS_API_URI + '/events', {
@@ -117,6 +122,46 @@ export default new Vuex.Store({
           return !error.champErreur.startsWith(field)
         })
       )
+    },
+    handleDeleteEvent({ dispatch, state }, eventId) {
+      dispatch('showConfirm', {
+        display: true,
+        title: `Supprimer l'événement`,
+        message: `Confirmez vous la suppression de l'événement ?`,
+        callbackConfirmed: async () => {
+          try {
+            await dispatch('deleteEvent', eventId)
+            dispatch('closeConfirm')
+          } catch (error) {
+            dispatch('closeConfirm')
+            dispatch('showConfirm', {
+              display: true,
+              title: `ERREUR`,
+              message: `Impossible de supprimer`,
+              callbackConfirmed: async () => {
+                dispatch('closeConfirm')
+              }
+            })
+          }
+        },
+        callbackCanceled: () => {
+          dispatch('closeConfirm')
+        }
+      })
+    },
+    async deleteEvent({ dispatch }, eventId) {
+      const data = await fetch(
+        process.env.VUE_APP_EVENTS_API_URI + `/events/${eventId}`,
+        {
+          method: 'DELETE',
+          mode: 'cors'
+        }
+      )
+      if (data.ok) {
+        await dispatch('findEvents')
+      } else {
+        await transformErrorToException(data)
+      }
     }
   }
 })

@@ -6,7 +6,7 @@
       <router-view />
     </v-content>
     <loader />
-    <confirm :display="confirm.display" :title="confirm.title" :message="confirm.message" @okConfirm="" />
+    <confirm :display="confirm.display" :title="confirm.title" :message="confirm.message" :callbackConfirmed="confirm.callbackConfirmed" :callbackCanceled="confirm.callbackCanceled" />
   </v-app>
 </template>
 

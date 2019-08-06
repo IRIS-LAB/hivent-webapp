@@ -10,11 +10,8 @@
         </div>
       </v-card-title>
       <v-card-actions>
-        <v-btn icon>
-          <v-icon
-            @click="setConfirm({display: true , title: 'Test', message: 'Test message'})"
-            color="red"
-          >delete</v-icon>
+        <v-btn icon @click="handleDeleteEvent(event.id)">
+          <v-icon color="red">delete</v-icon>
         </v-btn>
         <v-spacer></v-spacer>
         <v-btn flat>Détails</v-btn>
@@ -49,7 +46,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['setConfirm'])
+    ...mapActions(['handleDeleteEvent'])
   }
 }
 </script>
