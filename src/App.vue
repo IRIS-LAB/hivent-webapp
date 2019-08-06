@@ -2,23 +2,26 @@
   <v-app id="app">
     <nav-bar></nav-bar>
     <v-content>
-      <event-dialog v-if='showEventDialog'></event-dialog>
-      <router-view/>
+      <event-dialog v-if="showEventDialog"></event-dialog>
+      <router-view />
     </v-content>
+    <loader />
+    <confirm :display="confirm.display" :title="confirm.title" :message="confirm.message" :callbackConfirmed="confirm.callbackConfirmed" :callbackCanceled="confirm.callbackCanceled" />
   </v-app>
 </template>
 
 <script>
 import NavBar from '@/components/NavBar'
 import EventDialog from '@/views/EventDialog'
-import {mapState} from 'vuex'
-
+import Loader from '@/components/Loader.vue'
+import Confirm from '@/components/Confirm.vue'
+import { mapState } from 'vuex'
 
 export default {
   name: 'App',
-  components: { NavBar, EventDialog },
-  computed:{
-    ...mapState(['showEventDialog'])
+  components: { NavBar, EventDialog, Loader, Confirm },
+  computed: {
+    ...mapState(['showEventDialog', 'confirm'])
   }
 }
 </script>

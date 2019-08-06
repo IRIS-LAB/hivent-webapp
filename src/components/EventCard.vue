@@ -1,7 +1,7 @@
 <template>
   <div class="event-card">
     <v-card>
-      <v-img :src="event.image" height="180px"></v-img>
+      <v-img :src="event.imageURL" height="180px"></v-img>
 
       <v-card-title primary-title>
         <div>
@@ -10,6 +10,9 @@
         </div>
       </v-card-title>
       <v-card-actions>
+        <v-btn icon @click="handleDeleteEvent(event.id)">
+          <v-icon color="red">delete</v-icon>
+        </v-btn>
         <v-spacer></v-spacer>
         <v-btn flat>Détails</v-btn>
         <v-btn flat color="purple">S'inscrire</v-btn>
@@ -20,6 +23,8 @@
 
 <script>
 import moment from 'moment'
+import { mapActions } from 'vuex'
+
 export default {
   name: 'event',
   props: {
@@ -39,6 +44,9 @@ export default {
         moment(this.event.endDate).format('HH:mm')
       return lblDate
     }
+  },
+  methods: {
+    ...mapActions(['handleDeleteEvent'])
   }
 }
 </script>

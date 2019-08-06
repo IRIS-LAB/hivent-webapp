@@ -1,4 +1,8 @@
-import { BusinessException, TechnicalException } from '@u-iris/iris-common'
+import {
+  BusinessException,
+  TechnicalException,
+  EntityNotFoundBusinessException
+} from '@u-iris/iris-common'
 
 const transformErrorToException = async data => {
   const json = await data.json()
@@ -6,6 +10,8 @@ const transformErrorToException = async data => {
   switch (data.status) {
     case 400:
       throw new BusinessException(json.erreurs)
+    case 404:
+      throw new EntityNotFoundBusinessException(json.erreurs)
     default:
       throw new TechnicalException(json.erreurs)
   }
