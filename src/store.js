@@ -123,7 +123,7 @@ export default new Vuex.Store({
         })
       )
     },
-    handleDeleteEvent({ dispatch, state }, eventId) {
+    handleDeleteEvent({ dispatch }, eventId) {
       dispatch('showConfirm', {
         display: true,
         title: `Supprimer l'événement`,
@@ -131,9 +131,11 @@ export default new Vuex.Store({
         callbackConfirmed: async () => {
           try {
             await dispatch('deleteEvent', eventId)
+            await dispatch('findEvents')
             dispatch('closeConfirm')
           } catch (error) {
             dispatch('closeConfirm')
+            // TODO : tester 500 ou 404
             dispatch('showConfirm', {
               display: true,
               title: `ERREUR`,
@@ -157,9 +159,7 @@ export default new Vuex.Store({
           mode: 'cors'
         }
       )
-      if (data.ok) {
-        await dispatch('findEvents')
-      } else {
+      if (!data.ok) {
         await transformErrorToException(data)
       }
     }
